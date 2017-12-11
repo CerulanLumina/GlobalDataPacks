@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = ID, name = NAME, version = VERSION, dependencies = DEPENDENCIES, acceptedMinecraftVersions = MINECRAFT)
+@Mod(modid = ID, name = NAME, version = VERSION, dependencies = DEPENDENCIES, acceptedMinecraftVersions = MINECRAFT, acceptableRemoteVersions="*")
 public final class GlobalDataPacks {
 
     @Instance

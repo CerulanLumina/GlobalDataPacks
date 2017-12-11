@@ -34,6 +34,7 @@ public class Handler {
 
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
+		if(event.getWorld().isRemote) return;
 		Path worldDataDir = DimensionManager.getCurrentSaveRootDirectory().toPath().resolve("data");
 		Path worldAdv = worldDataDir.resolve("advancements");
 		Path worldFunc = worldDataDir.resolve("functions");
