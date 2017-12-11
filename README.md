@@ -1,4 +1,4 @@
-Etheria
+GlobalDataPacks
 ===
 
-### A Minecraft mod that introduces a tech tree which revolves around processing and utility.
+### Adds a way for Minecraft modpack developers to add datapacks to their configuration that will automatically be copied to each new world. 
