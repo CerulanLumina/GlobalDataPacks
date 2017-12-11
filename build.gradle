@@ -1,0 +1,112 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        jcenter()
+
+        maven {
+            name 'Forge'
+            url = 'http://files.minecraftforge.net/maven'
+        }
+
+        maven {
+            // Required for the curseforge task
+            name = 'gradle'
+            url 'https://plugins.gradle.org/m2/'
+        }
+
+        maven {
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.0.7' // Required for the curseforge task
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.matthewprenger.cursegradle' // Required for the curseforge task
+
+group = mod_group
+archivesBaseName = "${mod_name}_${mc_version}"
+
+apply from: 'gradle/scripts/version.gradle'
+apply from: 'gradle/scripts/dependencies.gradle'
+apply from: 'gradle/scripts/artifacts.gradle'
+apply from: 'gradle/scripts/upload.gradle'
+
+sourceCompatibility = targetCompatibility = '1.8'
+
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+    version = project.mc_version + '-' + project.forge_version
+    mappings = project.mc_mappings
+
+    runDir = 'run'
+
+    replace '@MINECRAFT_VERSION@', project.mc_version
+    replace '@FORGE_VERSION@', project.forge_version
+    replace '@MOD_VERSION@', project.version
+
+    replace '@MOD_MODID@', project.mod_modid
+    replace '@MOD_NAME@', project.mod_name
+
+    replace '@MOD_AUTHOR_ID@', project.mod_author_id
+    replace '@MOD_AUTHOR_NAME@', project.mod_author_name
+    replace '@MOD_DESCRIPTION@', project.mod_description
+    replace '@MOD_GITHUB@', project.mod_github
+
+    if (project.hasProperty('JAR_SIGNING_SHA1_SIGNATURE')) {
+        replace '@FINGERPRINT@', project.property('JAR_SIGNING_SHA1_SIGNATURE')
+    }
+}
+
+processResources {
+    inputs.property 'mcversion', project.minecraft.version
+    inputs.property 'version', project.version
+
+    inputs.property 'mod_modid', project.mod_modid
+    inputs.property 'mod_name', project.mod_name
+
+    inputs.property 'mod_author_id', project.mod_author_id
+    inputs.property 'mod_author_name', project.mod_author_name
+    inputs.property 'mod_description', project.mod_description
+    inputs.property 'mod_github', project.mod_github
+
+    from (sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        expand 'version': project.version,'mcversion': project.minecraft.version, 'mod_modid': project.mod_modid, 'mod_name': project.mod_name, 'mod_author_id': project.mod_author_id, 'mod_author_name': project.mod_author_name, 'mod_description': project.mod_description, 'mod_github': project.mod_github
+    }
+
+    from (sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+tasks.withType(JavaExec) {
+    println System.getProperty('DEBUG', 'false')
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+        jvmArgs '-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9099'
+    }
+}
+
+jar {
+    from (configurations.shade.collect { it.isDirectory() ? it : zipTree(it) })
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += 'src/api/java'
+        }
+    }
+}
